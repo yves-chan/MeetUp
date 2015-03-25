@@ -87,7 +87,7 @@ public class Schedule {
 			String lastTime = section.getCourseTime().getEndTime();
 			while (it.hasNext()) {
 				section = it.next();
-				String nextTime = section.getCourseTime().getEndTime();
+				String nextTime = section.getCourseTime().getStartTime();
 
 				if (calculateBreakTimeInMinutes(nextTime, lastTime) >= 120) {
 					startTimes.add(lastTime);

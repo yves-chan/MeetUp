@@ -309,15 +309,33 @@ public class MapDisplayFragment extends Fragment {
         Schedule mySchedule = me.getSchedule();
         Set<String> randomBreaks = randomSchedule.getStartTimesOfBreaks(activeDay);
         Set<String> myBreaks = mySchedule.getStartTimesOfBreaks(activeDay);
+        int morningBreak = 600;
+        int noonBreak = 720;
+        int afternoonBreak= 900;
+        int dinnerBreak = 1080;
 
 //        // CPSC 210 students: you must complete this method
-//        if (randomSchedule.getSections(activeDay)==null) {
-//            createSimpleDialog("You and the Student do not have classes on same day").show();
-//        } else if {
-//
-//        }
+        if (randomSchedule.getSections(activeDay)==null) {
+            createSimpleDialog("You and the Student do not have classes on same day").show();
+        } else {
+            for (String s: randomBreaks) {
+
+            }
+
+        }
 
     }
+
+    public int StringInMin(String s) {
+        String[] time = s.split(":");
+        int hours = Integer.parseInt(time[0]);
+        int  minutes = Integer.parseInt(time[1]);
+        int hoursInMin = hours*60;
+        return hoursInMin+minutes;
+    }
+
+
+
 
     /**
      * Initialize the PlaceFactory with information from FourSquare
