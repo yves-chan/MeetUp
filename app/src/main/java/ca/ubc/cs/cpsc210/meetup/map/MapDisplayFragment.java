@@ -87,6 +87,13 @@ public class MapDisplayFragment extends Fragment {
     private String activeDay = "MWF";
 
     /**
+     * String to know what the time of meet up is
+     */
+    private String activeTime = "12";
+
+
+    private int placeDistance = 250;
+    /**
      * A central location in campus that might be handy.
      */
     private final static GeoPoint UBC_MARTHA_PIPER_FOUNTAIN = new GeoPoint(49.264865,
@@ -259,6 +266,8 @@ public class MapDisplayFragment extends Fragment {
         // UNCOMMENT NEXT LINE ONCE YOU HAVE INSTANTIATED mySchedulePlot
         clearSchedules();
         activeDay = sharedPreferences.getString("dayOfWeek","MWF");
+        activeTime = sharedPreferences.getString("timeOfDay", "12")+":00";
+        placeDistance = sharedPreferences.getInt("placeDistance", 250);
         SortedSet mySections = me.getSchedule().getSections(activeDay);
         SchedulePlot mySchedulePlot = new SchedulePlot(mySections, "Yves", "Blue", R.drawable.ic_action_place);
         new GetRoutingForSchedule().execute(mySchedulePlot);
@@ -307,21 +316,16 @@ public class MapDisplayFragment extends Fragment {
     public void findMeetupPlace() {
         Schedule randomSchedule = randomStudent.getSchedule();
         Schedule mySchedule = me.getSchedule();
-        Set<String> randomBreaks = randomSchedule.getStartTimesOfBreaks(activeDay);
-        Set<String> myBreaks = mySchedule.getStartTimesOfBreaks(activeDay);
-        int morningBreak = 600;
-        int noonBreak = 720;
-        int afternoonBreak= 900;
-        int dinnerBreak = 1080;
 
 //        // CPSC 210 students: you must complete this method
         if (randomSchedule.getSections(activeDay)==null) {
             createSimpleDialog("You and the Student do not have classes on same day").show();
         } else {
-            for (String s: randomBreaks) {
+               if (isFree(randomSchedule) && isFree(mySchedule)){
 
-            }
-
+            } else {
+                   createSimpleDialog("You and your friend are not free").show();
+               }
         }
 
     }
@@ -334,6 +338,27 @@ public class MapDisplayFragment extends Fragment {
         return hoursInMin+minutes;
     }
 
+    public boolean isFree(Schedule schedule) {
+        SortedSet<Section> sections;
+        boolean isFree = false;
+        if (schedule.startTime(activeDay) == null) {
+            return true;
+        } else {
+            sections = schedule.getSections(activeDay);
+            for (Section s: sections) {
+                if (Integer.parseInt(s.getCourseTime().getStartTime()) < StringInMin(activeTime)) {
+                    if (Integer.parseInt(s.getCourseTime().getEndTime()) <= StringInMin(activeTime)) {
+                        isFree = true;
+                    }
+                } else if (Integer.parseInt(s.getCourseTime().getStartTime()) > StringInMin(activeTime+60)) {
+                        isFree = true;
+                } else
+                    isFree = false;
+                break;
+            }
+        }
+        return isFree;
+    }
 
 
 
