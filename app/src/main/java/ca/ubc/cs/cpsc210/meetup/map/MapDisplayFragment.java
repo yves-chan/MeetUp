@@ -55,6 +55,7 @@ import ca.ubc.cs.cpsc210.meetup.R;
 import ca.ubc.cs.cpsc210.meetup.model.Building;
 import ca.ubc.cs.cpsc210.meetup.model.Course;
 import ca.ubc.cs.cpsc210.meetup.model.CourseFactory;
+import ca.ubc.cs.cpsc210.meetup.model.Place;
 import ca.ubc.cs.cpsc210.meetup.model.PlaceFactory;
 import ca.ubc.cs.cpsc210.meetup.model.Schedule;
 import ca.ubc.cs.cpsc210.meetup.model.Section;
@@ -92,7 +93,7 @@ public class MapDisplayFragment extends Fragment {
     private String activeTime = "12";
 
 
-    private int placeDistance = 250;
+    private String placeDistance = "250";
     /**
      * A central location in campus that might be handy.
      */
@@ -103,7 +104,10 @@ public class MapDisplayFragment extends Fragment {
      * Meetup Service URL
      * CPSC 210 Students: Complete the string.
      */
+
     private final String getStudentURL = "http://kramer.nss.cs.ubc.ca:8081/getStudent/";
+    private final String getStudentURL_MWF_AFTERNOON = "http://kramer.nss.cs.ubc.ca:8081/getStudentById/333333";
+
 
     /**
      * FourSquare URLs. You must complete the client_id and client_secret with values
@@ -266,8 +270,8 @@ public class MapDisplayFragment extends Fragment {
         // UNCOMMENT NEXT LINE ONCE YOU HAVE INSTANTIATED mySchedulePlot
         clearSchedules();
         activeDay = sharedPreferences.getString("dayOfWeek","MWF");
-        activeTime = sharedPreferences.getString("timeOfDay", "12")+":00";
-        placeDistance = sharedPreferences.getInt("placeDistance", 250);
+        activeTime = sharedPreferences.getString("timeOfDay", "12");
+        placeDistance = sharedPreferences.getString("placeDistance", "250");
         SortedSet mySections = me.getSchedule().getSections(activeDay);
         SchedulePlot mySchedulePlot = new SchedulePlot(mySections, "Yves", "Blue", R.drawable.ic_action_place);
         new GetRoutingForSchedule().execute(mySchedulePlot);
@@ -316,13 +320,24 @@ public class MapDisplayFragment extends Fragment {
     public void findMeetupPlace() {
         Schedule randomSchedule = randomStudent.getSchedule();
         Schedule mySchedule = me.getSchedule();
+        Building myBuilding;
+        Building randomBuilding;
+        LatLon myLocation;
+        LatLon randomLocation;
+        Set<Place> myPlaces;
+        Set<Place> randomPlaces;
 
 //        // CPSC 210 students: you must complete this method
         if (randomSchedule.getSections(activeDay)==null) {
             createSimpleDialog("You and the Student do not have classes on same day").show();
         } else {
                if (isFree(randomSchedule) && isFree(mySchedule)){
-
+                   myBuilding = mySchedule.whereAmI(activeDay,activeTime);
+                   randomBuilding = randomSchedule.whereAmI(activeDay, activeTime); //whereAmI does not exist because I did not have class before that time
+                   myLocation = myBuilding.getLatLon();
+                   randomLocation = randomBuilding.getLatLon();
+                   myPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(myLocation, Integer.parseInt(placeDistance));
+                   randomPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(randomLocation, Integer.parseInt(placeDistance));
             } else {
                    createSimpleDialog("You and your friend are not free").show();
                }
@@ -341,22 +356,23 @@ public class MapDisplayFragment extends Fragment {
     public boolean isFree(Schedule schedule) {
         SortedSet<Section> sections;
         boolean isFree = false;
-        if (schedule.startTime(activeDay) == null) {
-            return true;
-        } else {
             sections = schedule.getSections(activeDay);
             for (Section s: sections) {
-                if (Integer.parseInt(s.getCourseTime().getStartTime()) < StringInMin(activeTime)) {
-                    if (Integer.parseInt(s.getCourseTime().getEndTime()) <= StringInMin(activeTime)) {
+                if (StringInMin(s.getCourseTime().getStartTime()) < (Integer.parseInt(activeTime) * 60)) {
+                    if (StringInMin(s.getCourseTime().getEndTime()) <= Integer.parseInt(activeTime) * 60) {
                         isFree = true;
                     }
-                } else if (Integer.parseInt(s.getCourseTime().getStartTime()) > StringInMin(activeTime+60)) {
+                }
+
+                if (StringInMin(s.getCourseTime().getStartTime()) >= Integer.parseInt(activeTime) * 60) {
+                    if (StringInMin(s.getCourseTime().getStartTime()) >= (Integer.parseInt(activeTime) * 60 + 60)) {
                         isFree = true;
-                } else
-                    isFree = false;
-                break;
+                    } else {
+                        isFree = false;
+                        break;
+                    }
+                }
             }
-        }
         return isFree;
     }
 
@@ -565,7 +581,7 @@ public class MapDisplayFragment extends Fragment {
             GeoPointParser geoPointParser = new GeoPointParser();
 
             try {
-                randomStudentString = makeRandomStudentSchedule(getStudentURL);
+                randomStudentString = makeRandomStudentSchedule(getStudentURL_MWF_AFTERNOON);
                 ranStudentSections = studentParser.parse(randomStudentString);
                 //add student to student manager
                 studentManager.addStudent(studentParser.getRanLastName(),
