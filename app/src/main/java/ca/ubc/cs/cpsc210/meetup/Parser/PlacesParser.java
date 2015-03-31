@@ -11,6 +11,7 @@ import ca.ubc.cs.cpsc210.meetup.model.PlaceFactory;
 import ca.ubc.cs.cpsc210.meetup.util.LatLon;
 
 /**
+ * Parses places from Foursquare
  * Created by yves on 23/03/15.
  */
 

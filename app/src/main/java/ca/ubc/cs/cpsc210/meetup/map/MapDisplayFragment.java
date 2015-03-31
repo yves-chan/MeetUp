@@ -92,8 +92,11 @@ public class MapDisplayFragment extends Fragment {
      */
     private String activeTime = "12";
 
-
+    /**
+     * String to know the placeDistance Setting
+     */
     private String placeDistance = "2000";
+
     /**
      * A central location in campus that might be handy.
      */
@@ -104,8 +107,11 @@ public class MapDisplayFragment extends Fragment {
      * Meetup Service URL
      * CPSC 210 Students: Complete the string.
      */
-
     private final String getStudentURL = "http://kramer.nss.cs.ubc.ca:8081/getStudent/";
+
+    /**
+     * Student used to test
+     */
     private final String getStudentURL_MWF_AFTERNOON = "http://kramer.nss.cs.ubc.ca:8081/getStudentById/333333";
 
 
@@ -273,7 +279,7 @@ public class MapDisplayFragment extends Fragment {
         activeTime = sharedPreferences.getString("timeOfDay", "12");
         placeDistance = sharedPreferences.getString("placeDistance", "250");
         SortedSet mySections = me.getSchedule().getSections(activeDay);
-        SchedulePlot mySchedulePlot = new SchedulePlot(mySections, "Yves", "Blue", R.drawable.ic_action_place);
+        SchedulePlot mySchedulePlot = new SchedulePlot(mySections, "Yves", "#000000", R.drawable.ic_action_place);
         new GetRoutingForSchedule().execute(mySchedulePlot);
     }
 
@@ -329,7 +335,6 @@ public class MapDisplayFragment extends Fragment {
         LatLon defaultLocation;
         Set<Place> myPlaces;
         Set<Place> randomPlaces;
-        Set<Place> totalPlaces;
 
 //        // CPSC 210 students: you must complete this method
         if (randomSchedule.getSections(activeDay)==null) {
@@ -340,25 +345,33 @@ public class MapDisplayFragment extends Fragment {
                    randomBuilding = randomSchedule.whereAmI(activeDay, activeTime);
                    if (myBuilding == null || randomBuilding == null) {
                        defaultLocation = new LatLon(UBC_MARTHA_PIPER_FOUNTAIN.getLatitude(), UBC_MARTHA_PIPER_FOUNTAIN.getLongitude());
-                       createSimpleDialog("You and the Student  can meet at places near the fountain, since you both do not have class before this time").show();
+                       createSimpleDialog("You and your friend  can meet at places near the fountain, since you or your friend do not have class before this time").show();
                        myPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(defaultLocation, Integer.parseInt(placeDistance));
-                       for (Place p : myPlaces) {
-                           Building b = new Building(p.getName(), p.getLatLon());
-                           plotABuilding(b, p.getName(),p.getDisplayText(), R.drawable.ic_action_settings);
+                       if (myPlaces.size() == 0) {
+                           createSimpleDialog("Please get places first").show();
+                       } else {
+                           for (Place p : myPlaces) {
+                               Building b = new Building(p.getName(), p.getLatLon());
+                               plotABuilding(b, p.getName(), p.getDisplayText(), R.drawable.ic_action_settings);
+                           }
                        }
                    } else {
                        myLocation = myBuilding.getLatLon();
                        randomLocation = randomBuilding.getLatLon();
                        myPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(myLocation, Integer.parseInt(placeDistance));
                        randomPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(randomLocation, Integer.parseInt(placeDistance));
-                       createSimpleDialog("You have " +myPlaces.size()+ " places near you and " +randomPlaces.size() + " near your friend").show();
-                       for (Place p : myPlaces) {
-                           Building b = new Building(p.getName(), p.getLatLon());
-                           plotABuilding(b, p.getName(),p.getDisplayText(), R.drawable.ic_action_settings);
-                       }
-                       for (Place p : randomPlaces) {
-                           Building b = new Building(p.getName(), p.getLatLon());
-                           plotABuilding(b, p.getName(),p.getDisplayText(), R.drawable.ic_action_settings);
+                       if (myPlaces.size() == 0) {
+                           createSimpleDialog("Please get places first").show();
+                       } else {
+                           createSimpleDialog("You have " + myPlaces.size() + " places near you and " + randomPlaces.size() + " near your friend").show();
+                           for (Place p : myPlaces) {
+                               Building b = new Building(p.getName(), p.getLatLon());
+                               plotABuilding(b, p.getName(), p.getDisplayText(), R.drawable.ic_action_settings);
+                           }
+                           for (Place p : randomPlaces) {
+                               Building b = new Building(p.getName(), p.getLatLon());
+                               plotABuilding(b, p.getName(), p.getDisplayText(), R.drawable.ic_action_settings);
+                           }
                        }
                    }
             } else {
@@ -368,6 +381,11 @@ public class MapDisplayFragment extends Fragment {
 
     }
 
+    /**
+     * Converts a "HH:MM" time to an int in minutes since Midnight
+     * @param s The string in "HH:MM"
+     * @return
+     */
     public int StringInMin(String s) {
         String[] time = s.split(":");
         int hours = Integer.parseInt(time[0]);
@@ -376,26 +394,16 @@ public class MapDisplayFragment extends Fragment {
         return hoursInMin+minutes;
     }
 
+    /**
+     * Determines if a student is free, given a schedule
+     * @param schedule The schedule of the student
+     * @return
+     */
     public boolean isFree(Schedule schedule) {
         SortedSet<Section> sections;
         boolean isFree = false;
         sections = schedule.getSections(activeDay);
         for (Section s : sections) {
-//                if (StringInMin(s.getCourseTime().getStartTime()) < (Integer.parseInt(activeTime) * 60)) {
-//                    if (StringInMin(s.getCourseTime().getEndTime()) <= Integer.parseInt(activeTime) * 60) {
-//                        isFree = true;
-//                    }
-//                }
-//
-//                if (StringInMin(s.getCourseTime().getStartTime()) >= Integer.parseInt(activeTime) * 60) {
-//                    if (StringInMin(s.getCourseTime().getStartTime()) >= (Integer.parseInt(activeTime) * 60 + 60)) {
-//                        isFree = true;
-//                    } else {
-//                        isFree = false;
-//                        break;
-//                    }
-//                }
-//            }
             if (StringInMin(s.getCourseTime().getEndTime()) <= (Integer.parseInt(activeTime) * 60)) {
                 isFree = true;
             } else {
@@ -622,13 +630,6 @@ public class MapDisplayFragment extends Fragment {
                         studentParser.getRanFirstName(),
                         studentParser.getRanStudentId());
                 //for each section that the student has, add it to their schedule
-//                Iterator<Section> iterator = ranStudentSections.iterator();
-//                while (iterator.hasNext()) {
-//                    studentManager.addSectionToSchedule(studentParser.getRanStudentId(),
-//                            iterator.next().getCourse().getCode(),
-//                            iterator.next().getCourse().getNumber(),
-//                            iterator.next().getName());
-//                }
                 for (Section s:ranStudentSections){
                     studentManager.addSectionToSchedule(studentParser.getRanStudentId(),
                             s.getCourse().getCode(),
@@ -775,20 +776,6 @@ public class MapDisplayFragment extends Fragment {
             return scheduleToPlot;
         }
 
-
-//        /**
-//         * An example helper method to call a web service
-//         */
-//        private String makeRoutingCall(String httpRequest) throws MalformedURLException, IOException {
-//            URL url = new URL(httpRequest);
-//            HttpURLConnection client = (HttpURLConnection) url.openConnection();
-//            InputStream in = client.getInputStream();
-//            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-//            String returnString = br.readLine();
-//            client.disconnect();
-//            return returnString;
-//        }
-
         @Override
         protected void onPostExecute(SchedulePlot schedulePlot) {
 
@@ -813,6 +800,13 @@ public class MapDisplayFragment extends Fragment {
 
     }
 
+    /**
+     * Calls on the URL
+     * @param httpRequest The URL you want to extract information from
+     * @return
+     * @throws MalformedURLException
+     * @throws IOException
+     */
     private String makeRoutingCall(String httpRequest) throws MalformedURLException, IOException {
         URL url = new URL(httpRequest);
         HttpURLConnection client = (HttpURLConnection) url.openConnection();

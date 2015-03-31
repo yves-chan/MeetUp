@@ -21,6 +21,7 @@ import ca.ubc.cs.cpsc210.meetup.model.Schedule;
 import ca.ubc.cs.cpsc210.meetup.model.Section;
 
 /**
+ *  Parses Random Student information
  * Created by yves on 19/03/15.
  */
 public class RandomStudentParser {
@@ -35,6 +36,9 @@ public class RandomStudentParser {
     private CourseFactory courseFactory;
 
 
+    /**
+     * Constructor
+     */
     public RandomStudentParser() {
     }
 

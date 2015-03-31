@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Parses a JSON to get Geopoints
  * Created by yves on 18/03/15.
  */
 public class GeoPointParser {
@@ -22,6 +23,9 @@ public class GeoPointParser {
     GeoPoint geoPoint;
     List<GeoPoint> geoPointList;
 
+    /**
+     * Constructor
+     */
     public GeoPointParser() {
     }
 
