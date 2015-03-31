@@ -318,6 +318,8 @@ public class MapDisplayFragment extends Fragment {
      * in class at the specified time)
      */
     public void findMeetupPlace() {
+        activeTime = sharedPreferences.getString("timeOfDay", "12");
+        placeDistance = sharedPreferences.getString("placeDistance", "250");
         Schedule randomSchedule = randomStudent.getSchedule();
         Schedule mySchedule = me.getSchedule();
         Building myBuilding;
