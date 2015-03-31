@@ -284,7 +284,7 @@ public class MapDisplayFragment extends Fragment {
     }
 
     /**
-     * Retrieve a random student's schedule from the Meetup web service and
+     * Retrieve a random student's schedule from the MeetUp web service and
      * plot a route for the schedule on the map. The plot should be for
      * the given day of the week as determined when "me"'s schedule
      * was plotted.
@@ -384,7 +384,7 @@ public class MapDisplayFragment extends Fragment {
     /**
      * Converts a "HH:MM" time to an int in minutes since Midnight
      * @param s The string in "HH:MM"
-     * @return
+     * @return The int that is converted
      */
     public int StringInMin(String s) {
         String[] time = s.split(":");
@@ -397,25 +397,21 @@ public class MapDisplayFragment extends Fragment {
     /**
      * Determines if a student is free, given a schedule
      * @param schedule The schedule of the student
-     * @return
+     * @return True if the schedule of student is free, otherwise return false
      */
     public boolean isFree(Schedule schedule) {
         SortedSet<Section> sections;
-        boolean isFree = false;
         sections = schedule.getSections(activeDay);
         for (Section s : sections) {
             if (StringInMin(s.getCourseTime().getEndTime()) <= (Integer.parseInt(activeTime) * 60)) {
-                isFree = true;
             } else {
                 if (StringInMin(s.getCourseTime().getStartTime()) >= (Integer.parseInt(activeTime) * 60 + 60)) {
-                    isFree = true;
                 } else {
-                    isFree = false;
-                    return  isFree;
+                    return false;
                 }
             }
         }
-        return isFree;
+        return true;
     }
 
 
