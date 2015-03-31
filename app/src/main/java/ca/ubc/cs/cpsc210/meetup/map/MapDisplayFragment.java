@@ -335,17 +335,29 @@ public class MapDisplayFragment extends Fragment {
         } else {
                if (isFree(randomSchedule) && isFree(mySchedule)){
                    myBuilding = mySchedule.whereAmI(activeDay,activeTime);
-                   randomBuilding = randomSchedule.whereAmI(activeDay, activeTime); //whereAmI does not exist because I did not have class before that time
+                   randomBuilding = randomSchedule.whereAmI(activeDay, activeTime);
                    if (myBuilding == null || randomBuilding == null) {
                        defaultLocation = new LatLon(UBC_MARTHA_PIPER_FOUNTAIN.getLatitude(), UBC_MARTHA_PIPER_FOUNTAIN.getLongitude());
                        createSimpleDialog("You and the Student  can meet at places near the fountain, since you both do not have class before this time").show();
-                       PlaceFactory.getInstance().findPlacesWithinDistance(defaultLocation, Integer.parseInt(placeDistance));
+                       myPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(defaultLocation, Integer.parseInt(placeDistance));
+                       for (Place p : myPlaces) {
+                           Building b = new Building(p.getName(), p.getLatLon());
+                           plotABuilding(b, p.getName(),p.getDisplayText(), R.drawable.ic_action_settings);
+                       }
                    } else {
                        myLocation = myBuilding.getLatLon();
                        randomLocation = randomBuilding.getLatLon();
                        myPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(myLocation, Integer.parseInt(placeDistance));
                        randomPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(randomLocation, Integer.parseInt(placeDistance));
                        createSimpleDialog("You have " +myPlaces.size()+ " places near you and " +randomPlaces.size() + " near your friend").show();
+                       for (Place p : myPlaces) {
+                           Building b = new Building(p.getName(), p.getLatLon());
+                           plotABuilding(b, p.getName(),p.getDisplayText(), R.drawable.ic_action_settings);
+                       }
+                       for (Place p : randomPlaces) {
+                           Building b = new Building(p.getName(), p.getLatLon());
+                           plotABuilding(b, p.getName(),p.getDisplayText(), R.drawable.ic_action_settings);
+                       }
                    }
             } else {
                    createSimpleDialog("You and your friend are not free").show();
@@ -590,7 +602,7 @@ public class MapDisplayFragment extends Fragment {
             GeoPointParser geoPointParser = new GeoPointParser();
 
             try {
-                randomStudentString = makeRandomStudentSchedule(getStudentURL_MWF_AFTERNOON);
+                randomStudentString = makeRandomStudentSchedule(getStudentURL);
                 ranStudentSections = studentParser.parse(randomStudentString);
                 //add student to student manager
                 studentManager.addStudent(studentParser.getRanLastName(),
