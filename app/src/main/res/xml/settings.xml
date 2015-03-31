@@ -20,7 +20,7 @@
             android:entries="@array/placeDistance"
             android:entryValues="@array/placeDistanceValues"
             android:key="placeDistance"
-            android:defaultValue="closest_stop_me"
+            android:defaultValue="250"
             android:summary="Set how close of the meetup place should be"
             android:title="Place Distance Options" />
 </PreferenceScreen>

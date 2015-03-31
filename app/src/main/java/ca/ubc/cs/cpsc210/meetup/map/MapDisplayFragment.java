@@ -93,7 +93,7 @@ public class MapDisplayFragment extends Fragment {
     private String activeTime = "12";
 
 
-    private String placeDistance = "250";
+    private String placeDistance = "2000";
     /**
      * A central location in campus that might be handy.
      */
@@ -324,8 +324,10 @@ public class MapDisplayFragment extends Fragment {
         Building randomBuilding;
         LatLon myLocation;
         LatLon randomLocation;
+        LatLon defaultLocation;
         Set<Place> myPlaces;
         Set<Place> randomPlaces;
+        Set<Place> totalPlaces;
 
 //        // CPSC 210 students: you must complete this method
         if (randomSchedule.getSections(activeDay)==null) {
@@ -334,10 +336,17 @@ public class MapDisplayFragment extends Fragment {
                if (isFree(randomSchedule) && isFree(mySchedule)){
                    myBuilding = mySchedule.whereAmI(activeDay,activeTime);
                    randomBuilding = randomSchedule.whereAmI(activeDay, activeTime); //whereAmI does not exist because I did not have class before that time
-                   myLocation = myBuilding.getLatLon();
-                   randomLocation = randomBuilding.getLatLon();
-                   myPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(myLocation, Integer.parseInt(placeDistance));
-                   randomPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(randomLocation, Integer.parseInt(placeDistance));
+                   if (myBuilding == null || randomBuilding == null) {
+                       defaultLocation = new LatLon(UBC_MARTHA_PIPER_FOUNTAIN.getLatitude(), UBC_MARTHA_PIPER_FOUNTAIN.getLongitude());
+                       createSimpleDialog("You and the Student  can meet at places near the fountain, since you both do not have class before this time").show();
+                       PlaceFactory.getInstance().findPlacesWithinDistance(defaultLocation, Integer.parseInt(placeDistance));
+                   } else {
+                       myLocation = myBuilding.getLatLon();
+                       randomLocation = randomBuilding.getLatLon();
+                       myPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(myLocation, Integer.parseInt(placeDistance));
+                       randomPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(randomLocation, Integer.parseInt(placeDistance));
+                       createSimpleDialog("You have " +myPlaces.size()+ " places near you and " +randomPlaces.size() + " near your friend").show();
+                   }
             } else {
                    createSimpleDialog("You and your friend are not free").show();
                }
@@ -812,8 +821,8 @@ public class MapDisplayFragment extends Fragment {
                         + "&v=" +todayAsString
                         + "&ll=" +fountainLat+","+fountainLon
                         + "&radius=2000"
-                        + "&section=food,coffee"
-                        + "&openNow=1"
+                        + "&section=food"
+                        + "&openNow=0"
                         + "&venuePhotos=1");
 
             } catch (IOException e) {
