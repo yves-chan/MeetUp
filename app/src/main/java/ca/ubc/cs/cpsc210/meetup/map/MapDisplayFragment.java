@@ -379,23 +379,34 @@ public class MapDisplayFragment extends Fragment {
     public boolean isFree(Schedule schedule) {
         SortedSet<Section> sections;
         boolean isFree = false;
-            sections = schedule.getSections(activeDay);
-            for (Section s: sections) {
-                if (StringInMin(s.getCourseTime().getStartTime()) < (Integer.parseInt(activeTime) * 60)) {
-                    if (StringInMin(s.getCourseTime().getEndTime()) <= Integer.parseInt(activeTime) * 60) {
-                        isFree = true;
-                    }
-                }
-
-                if (StringInMin(s.getCourseTime().getStartTime()) >= Integer.parseInt(activeTime) * 60) {
-                    if (StringInMin(s.getCourseTime().getStartTime()) >= (Integer.parseInt(activeTime) * 60 + 60)) {
-                        isFree = true;
-                    } else {
-                        isFree = false;
-                        break;
-                    }
+        sections = schedule.getSections(activeDay);
+        for (Section s : sections) {
+//                if (StringInMin(s.getCourseTime().getStartTime()) < (Integer.parseInt(activeTime) * 60)) {
+//                    if (StringInMin(s.getCourseTime().getEndTime()) <= Integer.parseInt(activeTime) * 60) {
+//                        isFree = true;
+//                    }
+//                }
+//
+//                if (StringInMin(s.getCourseTime().getStartTime()) >= Integer.parseInt(activeTime) * 60) {
+//                    if (StringInMin(s.getCourseTime().getStartTime()) >= (Integer.parseInt(activeTime) * 60 + 60)) {
+//                        isFree = true;
+//                    } else {
+//                        isFree = false;
+//                        break;
+//                    }
+//                }
+//            }
+            if (StringInMin(s.getCourseTime().getEndTime()) <= (Integer.parseInt(activeTime) * 60)) {
+                isFree = true;
+            } else {
+                if (StringInMin(s.getCourseTime().getStartTime()) >= (Integer.parseInt(activeTime) * 60 + 60)) {
+                    isFree = true;
+                } else {
+                    isFree = false;
+                    break;
                 }
             }
+        }
         return isFree;
     }
 
