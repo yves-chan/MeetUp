@@ -403,7 +403,7 @@ public class MapDisplayFragment extends Fragment {
                     isFree = true;
                 } else {
                     isFree = false;
-                    break;
+                    return  isFree;
                 }
             }
         }
