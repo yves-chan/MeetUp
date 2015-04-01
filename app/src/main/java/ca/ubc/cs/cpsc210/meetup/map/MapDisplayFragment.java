@@ -326,7 +326,7 @@ public class MapDisplayFragment extends Fragment {
     public void findMeetupPlace() {
         activeTime = sharedPreferences.getString("timeOfDay", "12");
         placeDistance = sharedPreferences.getString("placeDistance", "250");
-        Schedule randomSchedule = randomStudent.getSchedule();
+        Schedule randomSchedule;
         Schedule mySchedule = me.getSchedule();
         Building myBuilding;
         Building randomBuilding;
@@ -337,22 +337,23 @@ public class MapDisplayFragment extends Fragment {
         Set<Place> randomPlaces;
 
 //        // CPSC 210 students: you must complete this method
-        if (randomSchedule.getSections(activeDay)==null) {
-            createSimpleDialog("You and the Student do not have classes on same day").show();
+        if (randomStudent ==null) {
+            createSimpleDialog("You did not select a random student").show();
         } else {
+            randomSchedule = randomStudent.getSchedule();
                if (isFree(randomSchedule) && isFree(mySchedule)){
                    myBuilding = mySchedule.whereAmI(activeDay,activeTime);
                    randomBuilding = randomSchedule.whereAmI(activeDay, activeTime);
                    if (myBuilding == null || randomBuilding == null) {
                        defaultLocation = new LatLon(UBC_MARTHA_PIPER_FOUNTAIN.getLatitude(), UBC_MARTHA_PIPER_FOUNTAIN.getLongitude());
-                       createSimpleDialog("You and your friend  can meet at places near the fountain, since you or your friend do not have class before this time").show();
                        myPlaces = PlaceFactory.getInstance().findPlacesWithinDistance(defaultLocation, Integer.parseInt(placeDistance));
                        if (myPlaces.size() == 0) {
                            createSimpleDialog("Please get places first").show();
                        } else {
+                           createSimpleDialog("You and your friend  can meet at places near the fountain, since you or your friend do not have class before this time").show();
                            for (Place p : myPlaces) {
                                Building b = new Building(p.getName(), p.getLatLon());
-                               plotABuilding(b, p.getName(), p.getDisplayText(), R.drawable.ic_action_settings);
+                               plotABuilding(b, p.getName(), "Rating: "+p.getDisplayText(), R.drawable.ic_action_settings);
                            }
                        }
                    } else {
@@ -366,11 +367,11 @@ public class MapDisplayFragment extends Fragment {
                            createSimpleDialog("You have " + myPlaces.size() + " places near you and " + randomPlaces.size() + " near your friend").show();
                            for (Place p : myPlaces) {
                                Building b = new Building(p.getName(), p.getLatLon());
-                               plotABuilding(b, p.getName(), p.getDisplayText(), R.drawable.ic_action_settings);
+                               plotABuilding(b, p.getName(), "Rating: "+p.getDisplayText(), R.drawable.ic_action_settings);
                            }
                            for (Place p : randomPlaces) {
                                Building b = new Building(p.getName(), p.getLatLon());
-                               plotABuilding(b, p.getName(), p.getDisplayText(), R.drawable.ic_action_settings);
+                               plotABuilding(b, p.getName(), "Rating : "+p.getDisplayText(), R.drawable.ic_action_settings);
                            }
                        }
                    }
@@ -853,8 +854,7 @@ public class MapDisplayFragment extends Fragment {
             // PlaceFactory
             PlacesParser placeParse = new PlacesParser();
             placeParse.parse(jSONOfPlaces);
-            createSimpleDialog("You have:"+PlaceFactory.getInstance().getPlaces().size()).show();
-
+            createSimpleDialog("There are  "+PlaceFactory.getInstance().getPlaces().size() + " MeetUp places to go to in UBC.").show();
         }
     }
 

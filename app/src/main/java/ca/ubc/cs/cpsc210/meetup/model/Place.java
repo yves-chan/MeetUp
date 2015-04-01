@@ -16,6 +16,9 @@ public class Place extends Location {
     // The name of the place
     private String name;
 
+    //The rating of the place
+    private String rating;
+
     // Tags describing place
     private Set<String> tags;
 
@@ -24,7 +27,7 @@ public class Place extends Location {
      * @param placeName tThe name of the place
      */
     public Place(String placeName) {
-        this(placeName, new LatLon());
+        this(placeName, new LatLon(),"");
     }
 
     /**
@@ -32,10 +35,15 @@ public class Place extends Location {
      * @param placeName The name of the place
      * @param latLon The latitude and longitude of the place
      */
-    public Place(String placeName, LatLon latLon) {
+    public Place(String placeName, LatLon latLon, String rating) {
         super(latLon);
         name = placeName;
-        displayText = placeName;
+        if (rating == "") {
+            displayText = "This place has no rating";
+        }
+        else {
+            displayText = rating;
+        }
         tags = new HashSet<String>();
     }
 
@@ -62,6 +70,10 @@ public class Place extends Location {
 
     public String getName() {
         return name;
+    }
+
+    public String getRating() {
+        return rating;
     }
 
 }
