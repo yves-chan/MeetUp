@@ -41,7 +41,11 @@ public class PlacesParser {
             for (int i = 0 ; i < itemArray.length() ; i++) {
                 String name = itemArray.getJSONObject(i).getJSONObject("venue").getString("name");
                 JSONObject location = itemArray.getJSONObject(i).getJSONObject("venue").getJSONObject("location");
-                rating = itemArray.getJSONObject(i).getJSONObject("venue").getString("rating")+"";
+                if (itemArray.getJSONObject(i).getJSONObject("venue").isNull("rating")){
+                    rating = "";
+                } else {
+                    rating = itemArray.getJSONObject(i).getJSONObject("venue").getString("rating") + "";
+                }
                 double lat = location.getDouble("lat");
                 double lng = location.getDouble("lng");
                 LatLon latLon = new LatLon(lat, lng);

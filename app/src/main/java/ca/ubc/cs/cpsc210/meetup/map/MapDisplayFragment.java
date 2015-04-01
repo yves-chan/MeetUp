@@ -836,7 +836,7 @@ public class MapDisplayFragment extends Fragment {
                         + "&client_secret=" +FOUR_SQUARE_CLIENT_SECRET
                         + "&v=" +todayAsString
                         + "&ll=" +fountainLat+","+fountainLon
-                        + "&radius=2000"
+                        + "&radius=2500"
                         + "&section=food"
                         + "&openNow=0"
                         + "&venuePhotos=1");
